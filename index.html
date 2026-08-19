@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#102b57">
-<title>Pádel Adultos Jemenuño 2026 · v1.3</title>
+<title>Pádel Adultos Jemenuño 2026 · v1.4</title>
 
 <style>
 :root{
@@ -307,6 +307,40 @@ button{
  font-size:11px
 }
 
+.status{
+ margin-top:8px;
+ font-size:11px;
+ text-align:right;
+ opacity:.9
+}
+
+.status.ok{
+ color:#cdebbd
+}
+
+.status.error{
+ color:#ffd0d0
+}
+
+.winner{
+ padding:8px 11px;
+ background:#fafbfc;
+ border-bottom:1px solid #edf0f3;
+ display:flex;
+ align-items:center;
+ gap:8px;
+ flex-wrap:wrap
+}
+
+.winner select{
+ border:1px solid var(--line);
+ border-radius:7px;
+ padding:7px 8px;
+ background:#fff;
+ color:var(--navy);
+ font-weight:700
+}
+
 @media(max-width:600px){
 
  .match{
@@ -344,7 +378,7 @@ button{
 <h1>🏆 Pádel Adultos Jemenuño 2026</h1>
 
 <div class="sub">
-Torneo · Fase Liga · Cuartos · Semifinal · Final · <b>v1.3</b>
+Torneo · Fase Liga · Cuartos · Semifinal · Final · <b>v1.4</b>
 </div>
 
 <div class="header-actions">
@@ -356,6 +390,10 @@ onclick="resetAll()"
 Borrar todos los resultados
 </button>
 
+</div>
+
+<div id="connectionStatus" class="status">
+Conectando con Google Sheets...
 </div>
 
 </header>
@@ -497,6 +535,18 @@ El ranking posterior ordenará a los clasificados según el criterio establecido
 
 
 /* ==========================================================
+   CONFIGURACIÓN GOOGLE SHEETS
+   ========================================================== */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycby2ahC0_4gA1MH2-dQ_aDPMCNGvarWGX-vvpHJ-TDNQMyPihlDrVlmeKVULCPap6kBkrQ/exec";
+
+
+const STORAGE_KEY =
+"jem_padel_adultos_2026";
+
+
+/* ==========================================================
    PAREJAS
    ========================================================== */
 
@@ -596,27 +646,303 @@ const matches={
 let activeGroup=1;
 
 
-let state=JSON.parse(
-localStorage.getItem("jem_padel_adultos_2026")||"{}"
-);
+/* ==========================================================
+   ESTADO
+   ========================================================== */
 
+let state={
+results:{},
+knock:{}
+};
 
-state.results=state.results||{};
-state.knock=state.knock||{};
+let cargando=true;
 
 
 /* ==========================================================
-   GUARDADO
+   RESPALDO LOCAL
    ========================================================== */
 
-function save(){
+function saveLocalBackup(){
+
+try{
 
 localStorage.setItem(
-"jem_padel_adultos_2026",
+STORAGE_KEY,
 JSON.stringify(state)
 );
 
+}catch(error){
+
+console.warn(
+"No se pudo guardar el respaldo local",
+error
+);
+
+}
+
+}
+
+
+function loadLocalBackup(){
+
+try{
+
+const local=
+localStorage.getItem(STORAGE_KEY);
+
+if(!local)
+return null;
+
+const data=
+JSON.parse(local);
+
+data.results=data.results||{};
+data.knock=data.knock||{};
+
+return data;
+
+}catch(error){
+
+console.warn(
+"No se pudo leer el respaldo local",
+error
+);
+
+return null;
+
+}
+
+}
+
+
+/* ==========================================================
+   ESTADO DE CONEXIÓN
+   ========================================================== */
+
+function setStatus(text,type=""){
+
+const el=
+document.getElementById("connectionStatus");
+
+if(!el)
+return;
+
+el.textContent=text;
+
+el.className=
+"status "+type;
+
+}
+
+
+/* ==========================================================
+   GUARDAR EN GOOGLE SHEETS
+   ========================================================== */
+
+async function save(){
+
+/*
+ Guardamos primero una copia local como respaldo.
+*/
+
+saveLocalBackup();
+
+
+try{
+
+setStatus(
+"Guardando en Google Sheets..."
+);
+
+
+const response=
+await fetch(
+API_URL,
+{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify({
+action:"save",
+state:state
+})
+});
+
+
+if(!response.ok){
+
+throw new Error(
+"Google Sheets respondió con un error."
+);
+
+}
+
+
+const data=
+await response.json();
+
+
+if(!data.ok){
+
+throw new Error(
+data.message||
+"No se pudieron guardar los resultados."
+);
+
+}
+
+
+setStatus(
+"✓ Sincronizado con Google Sheets",
+"ok"
+);
+
+
 renderAll();
+
+
+}catch(error){
+
+console.error(error);
+
+setStatus(
+"⚠️ Sin conexión con Google Sheets",
+"error"
+);
+
+
+alert(
+"❌ No se han podido guardar los resultados en Google Sheets.\n\n"+
+"El resultado queda guardado temporalmente en este dispositivo.\n\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* ==========================================================
+   CARGAR DATOS DESDE GOOGLE SHEETS
+   ========================================================== */
+
+async function loadRemote(){
+
+try{
+
+cargando=true;
+
+setStatus(
+"Conectando con Google Sheets..."
+);
+
+
+const response=
+await fetch(
+API_URL,
+{
+method:"GET"
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"No se pudo conectar con Google Sheets."
+);
+
+}
+
+
+const datos=
+await response.json();
+
+
+state=
+datos||
+{
+results:{},
+knock:{}
+};
+
+
+state.results=
+state.results||{};
+
+state.knock=
+state.knock||{};
+
+
+/*
+ Actualizamos también el respaldo local.
+*/
+
+saveLocalBackup();
+
+
+cargando=false;
+
+
+setStatus(
+"✓ Conectado a Google Sheets",
+"ok"
+);
+
+
+renderAll();
+
+
+}catch(error){
+
+console.error(error);
+
+cargando=false;
+
+
+/*
+ Si falla la conexión, utilizamos el último
+ respaldo local disponible.
+*/
+
+const local=
+loadLocalBackup();
+
+
+if(local){
+
+state=local;
+
+setStatus(
+"⚠️ Sin conexión · usando datos locales",
+"error"
+);
+
+}else{
+
+state={
+results:{},
+knock:{}
+};
+
+setStatus(
+"⚠️ Sin conexión con Google Sheets",
+"error"
+);
+
+}
+
+
+renderAll();
+
+
+console.warn(
+"No se pudieron cargar los datos remotos:",
+error
+);
+
+}
 
 }
 
@@ -631,17 +957,24 @@ b.onclick=()=>{
 
 document
 .querySelectorAll(".tab")
-.forEach(x=>x.classList.remove("active"));
+.forEach(x=>
+x.classList.remove("active")
+);
 
 b.classList.add("active");
 
+
 document
 .querySelectorAll(".panel")
-.forEach(x=>x.classList.remove("active"));
+.forEach(x=>
+x.classList.remove("active")
+);
+
 
 document
 .getElementById(b.dataset.tab)
 .classList.add("active");
+
 
 renderAll();
 
@@ -658,13 +991,19 @@ document.querySelectorAll(".subtab").forEach(b=>{
 
 b.onclick=()=>{
 
-activeGroup=+b.dataset.group;
+activeGroup=
++b.dataset.group;
+
 
 document
 .querySelectorAll(".subtab")
-.forEach(x=>x.classList.remove("active"));
+.forEach(x=>
+x.classList.remove("active")
+);
+
 
 b.classList.add("active");
+
 
 renderGroups();
 
@@ -672,6 +1011,10 @@ renderGroups();
 
 });
 
+
+/* ==========================================================
+   CLAVE DE PARTIDO
+   ========================================================== */
 
 function key(g,i){
 
@@ -705,7 +1048,8 @@ gc:0
 
 matches[g].forEach((m,i)=>{
 
-let r=state.results[key(g,i)];
+let r=
+state.results[key(g,i)];
 
 
 if(
@@ -765,7 +1109,8 @@ if(
 (m[1]===b && m[2]===a)
 ){
 
-let r=state.results[key(g,i)];
+let r=
+state.results[key(g,i)];
 
 
 if(
@@ -796,6 +1141,7 @@ gamesB:sb
 };
 
 }
+
 else if(sb>sa){
 
 result={
@@ -818,7 +1164,6 @@ return result;
 
 /* ==========================================================
    DIFERENCIA DE JUEGOS ENTRE UN GRUPO DE PAREJAS
-   SOLO SUS ENFRENTAMIENTOS ENTRE ELLAS
    ========================================================== */
 
 function miniTable(g,teams){
@@ -850,7 +1195,8 @@ if(
 return;
 
 
-let r=state.results[key(g,i)];
+let r=
+state.results[key(g,i)];
 
 
 if(
@@ -903,10 +1249,6 @@ let teams=groups[g];
 let stats=getStats(g);
 
 
-/*
- Primero agrupamos por número de victorias.
-*/
-
 let victoryGroups={};
 
 
@@ -914,8 +1256,10 @@ teams.forEach(t=>{
 
 let w=stats[t].w;
 
+
 if(!victoryGroups[w])
 victoryGroups[w]=[];
+
 
 victoryGroups[w].push(t);
 
@@ -925,24 +1269,19 @@ victoryGroups[w].push(t);
 let ordered=[];
 
 
-/*
- Procesamos cada grupo de parejas con las mismas victorias.
-*/
-
 Object
 .keys(victoryGroups)
 .map(Number)
 .sort((a,b)=>b-a)
 .forEach(w=>{
 
-let tied=victoryGroups[w];
+let tied=
+victoryGroups[w];
 
 
-/*
- ==========================================================
- CASO 1: UNA PAREJA
- ==========================================================
- */
+/* ==========================================================
+   CASO 1: UNA PAREJA
+   ========================================================== */
 
 if(tied.length===1){
 
@@ -953,15 +1292,14 @@ return;
 }
 
 
-/*
- ==========================================================
- CASO 2: DOS PAREJAS
- ==========================================================
- */
+/* ==========================================================
+   CASO 2: DOS PAREJAS
+   ========================================================== */
 
 if(tied.length===2){
 
-let h2h=getHeadToHead(
+let h2h=
+getHeadToHead(
 g,
 tied[0],
 tied[1]
@@ -972,12 +1310,17 @@ if(h2h){
 
 if(h2h.winner===tied[0]){
 
-ordered.push(tied[0],tied[1]);
+ordered.push(
+tied[0],
+tied[1]
+);
 
-}
-else{
+}else{
 
-ordered.push(tied[1],tied[0]);
+ordered.push(
+tied[1],
+tied[0]
+);
 
 }
 
@@ -989,7 +1332,7 @@ return;
 /*
  Si todavía no hay partido entre ellas,
  usamos diferencia global.
- */
+*/
 
 tied.sort((a,b)=>{
 
@@ -1013,30 +1356,19 @@ return;
 }
 
 
-/*
- ==========================================================
- CASO 3 O MÁS PAREJAS
- ==========================================================
- */
+/* ==========================================================
+   CASO 3 O MÁS PAREJAS
+   ========================================================== */
 
-let mini=miniTable(g,tied);
+let mini=
+miniTable(g,tied);
 
-
-/*
- En vuestro formato todos juegan un único set,
- por lo que el criterio de sets no puede romper
- el triple empate.
-
- Utilizamos:
-
- 1. Victorias dentro del grupo empatado
- 2. Diferencia de juegos dentro del grupo empatado
-*/
 
 tied.sort((a,b)=>{
 
 let wa=mini[a].w;
 let wb=mini[b].w;
+
 
 if(wb!==wa)
 return wb-wa;
@@ -1050,16 +1382,14 @@ let db=
 mini[b].gf-
 mini[b].gc;
 
+
 if(db!==da)
 return db-da;
 
 
-/*
- Si dos quedan exactamente empatadas después
- de la mini-clasificación, enfrentamiento directo.
-*/
+let h2h=
+getHeadToHead(g,a,b);
 
-let h2h=getHeadToHead(g,a,b);
 
 if(h2h){
 
@@ -1072,10 +1402,6 @@ return 1;
 }
 
 
-/*
- Último criterio: diferencia global.
-*/
-
 let globalA=
 stats[a].gf-
 stats[a].gc;
@@ -1084,6 +1410,7 @@ let globalB=
 stats[b].gf-
 stats[b].gc;
 
+
 return globalB-globalA;
 
 });
@@ -1091,20 +1418,26 @@ return globalB-globalA;
 
 /*
  Si tras la mini-clasificación quedan
- dos parejas exactamente iguales, aplicamos
- enfrentamiento directo de forma explícita.
+ dos parejas exactamente empatadas,
+ aplicamos enfrentamiento directo.
 */
 
-for(let i=0;i<tied.length-1;i++){
+for(
+let i=0;
+i<tied.length-1;
+i++
+){
 
 let a=tied[i];
 let b=tied[i+1];
+
 
 let ma=
 mini[a].w;
 
 let mb=
 mini[b].w;
+
 
 let da=
 mini[a].gf-
@@ -1120,14 +1453,20 @@ ma===mb &&
 da===db
 ){
 
-let h2h=getHeadToHead(g,a,b);
+let h2h=
+getHeadToHead(g,a,b);
+
 
 if(h2h){
 
 if(h2h.winner===b){
 
-let ia=tied.indexOf(a);
-let ib=tied.indexOf(b);
+let ia=
+tied.indexOf(a);
+
+let ib=
+tied.indexOf(b);
+
 
 [tied[ia],tied[ib]]
 =
@@ -1160,6 +1499,7 @@ function renderGroups(){
 
 let sorted=
 getGroupStandings(activeGroup);
+
 
 let stats=
 getStats(activeGroup);
@@ -1198,7 +1538,9 @@ Clasificación — Grupo ${activeGroup}
 
 sorted.forEach((t,i)=>{
 
-let s=stats[t];
+let s=
+stats[t];
+
 
 table+=`
 
@@ -1353,12 +1695,14 @@ Seleccionar
 </option>
 
 <option
+value="${m[1]}"
 ${r.tb===m[1]?"selected":""}
 >
 ${m[1]}
 </option>
 
 <option
+value="${m[2]}"
 ${r.tb===m[2]?"selected":""}
 >
 ${m[2]}
@@ -1404,21 +1748,31 @@ attachResultListeners();
 
 
 /* ==========================================================
-   GUARDAR RESULTADOS
+   GUARDAR RESULTADOS DE LOS PARTIDOS
    ========================================================== */
 
 function attachResultListeners(){
 
 document
-.querySelectorAll('.score,[data-side="tb"]')
+.querySelectorAll(
+'.score,[data-side="tb"]'
+)
 .forEach(el=>{
 
-el.addEventListener("change",()=>{
+el.addEventListener(
+"change",
+()=>{
 
-let g=+el.dataset.g;
-let i=+el.dataset.i;
+let g=
++el.dataset.g;
 
-let k=key(g,i);
+let i=
++el.dataset.i;
+
+
+let k=
+key(g,i);
+
 
 state.results[k]=
 state.results[k]||
@@ -1428,18 +1782,18 @@ b:"",
 tb:""
 };
 
+
 state.results[k][el.dataset.side]
 =
 el.value.trim();
 
 
-localStorage.setItem(
-"jem_padel_adultos_2026",
-JSON.stringify(state)
-);
+/*
+ Guardamos automáticamente
+ en Google Sheets.
+*/
 
-
-renderAll();
+save();
 
 });
 
@@ -1448,17 +1802,25 @@ renderAll();
 }
 
 
+/* ==========================================================
+   BOTÓN GUARDAR GRUPO
+   ========================================================== */
+
 function saveGroupResults(g){
 
 document
-.querySelectorAll(`[data-g="${g}"]`)
+.querySelectorAll(
+`[data-g="${g}"]`
+)
 .forEach(el=>{
 
 if(!el.dataset.side)
 return;
 
+
 let k=
 key(g,+el.dataset.i);
+
 
 state.results[k]=
 state.results[k]||
@@ -1468,6 +1830,7 @@ b:"",
 tb:""
 };
 
+
 state.results[k][el.dataset.side]
 =
 el.value.trim();
@@ -1475,12 +1838,7 @@ el.value.trim();
 });
 
 
-localStorage.setItem(
-"jem_padel_adultos_2026",
-JSON.stringify(state)
-);
-
-renderAll();
+save();
 
 }
 
@@ -1503,15 +1861,20 @@ g++
 let stats=
 getStats(g);
 
+
 let standings=
 getGroupStandings(g);
 
 
 standings.forEach((t,i)=>{
 
-let s=stats[t];
+let s=
+stats[t];
 
-let pj=s.w+s.l;
+
+let pj=
+s.w+s.l;
+
 
 data.push({
 
@@ -1549,7 +1912,7 @@ rankingData();
 
 /*
  Mejores terceros entre Grupo 1 y Grupo 2.
- */
+*/
 
 let third12=
 d.filter(x=>
@@ -1576,7 +1939,7 @@ return b.gf-a.gf;
  G2 1º y 2º
  G3 1º, 2º y 3º
  Mejor 3º G1/G2
- */
+*/
 
 let qualified=[];
 
@@ -1613,9 +1976,9 @@ if(best3)
 qualified.push(best3);
 
 
-/*
- Mejores primeros
- */
+/* ==========================================================
+   MEJORES PRIMEROS
+   ========================================================== */
 
 let firsts=
 qualified
@@ -1625,14 +1988,17 @@ qualified
 if(b.wp!==a.wp)
 return b.wp-a.wp;
 
+
 let da=
 b.diff/(b.pj||1);
 
 let db=
 a.diff/(a.pj||1);
 
+
 if(da!==db)
 return da-db;
+
 
 return
 b.gf/(b.pj||1)-
@@ -1641,9 +2007,9 @@ a.gf/(a.pj||1);
 });
 
 
-/*
- Mejores segundos
- */
+/* ==========================================================
+   MEJORES SEGUNDOS
+   ========================================================== */
 
 let seconds=
 qualified
@@ -1653,14 +2019,17 @@ qualified
 if(b.wp!==a.wp)
 return b.wp-a.wp;
 
+
 let da=
 b.diff/(b.pj||1);
 
 let db=
 a.diff/(a.pj||1);
 
+
 if(da!==db)
 return da-db;
+
 
 return
 b.gf/(b.pj||1)-
@@ -1669,9 +2038,9 @@ a.gf/(a.pj||1);
 });
 
 
-/*
- Terceros
- */
+/* ==========================================================
+   TERCEROS
+   ========================================================== */
 
 let thirds=
 qualified
@@ -1681,8 +2050,10 @@ qualified
 if(b.wp!==a.wp)
 return b.wp-a.wp;
 
+
 if(b.diff!==a.diff)
 return b.diff-a.diff;
+
 
 return b.gf-a.gf;
 
@@ -1695,6 +2066,10 @@ let ranked=[
 ...thirds
 ];
 
+
+/* ==========================================================
+   RANKING HTML
+   ========================================================== */
 
 let html=`
 
@@ -1773,7 +2148,8 @@ html+=`
 
 document
 .getElementById("ranking")
-.innerHTML=html;
+.innerHTML=
+html;
 
 
 /* ==========================================================
@@ -1840,6 +2216,7 @@ ${p
 .map(x=>`
 
 <option
+value="${x.team}"
 ${state.knock["q"+i]===x.team?"selected":""}
 >
 ${x.team}
@@ -1878,7 +2255,8 @@ Guardar ganadores
 
 document
 .getElementById("quarters")
-.innerHTML=bhtml;
+.innerHTML=
+bhtml;
 
 }
 
@@ -1977,6 +2355,7 @@ ${p
 .map(x=>`
 
 <option
+value="${x}"
 ${state.knock["s"+i]===x?"selected":""}
 >
 ${x}
@@ -2015,7 +2394,8 @@ Guardar ganadores
 
 document
 .getElementById("semisContent")
-.innerHTML=h;
+.innerHTML=
+h;
 
 }
 
@@ -2076,6 +2456,7 @@ ${[a,b]
 .map(x=>`
 
 <option
+value="${x}"
 ${state.knock.f===x?"selected":""}
 >
 ${x}
@@ -2107,7 +2488,7 @@ Guardar campeón
 
 
 /* ==========================================================
-   ACTUALIZAR
+   ACTUALIZAR TODO
    ========================================================== */
 
 function renderAll(){
@@ -2127,19 +2508,103 @@ renderFinal();
    BORRAR TODO
    ========================================================== */
 
-function resetAll(){
+async function resetAll(){
 
-if(
-confirm(
+if(!confirm(
 "¿Seguro que quieres borrar TODOS los resultados del torneo? Esta acción eliminará los resultados de la fase de grupos, cuartos, semifinales y final."
-)
-){
+)){
+return;
+}
 
-localStorage.removeItem(
-"jem_padel_adultos_2026"
+
+try{
+
+setStatus(
+"Borrando resultados..."
 );
 
-location.reload();
+
+const response=
+await fetch(
+API_URL,
+{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify({
+action:"reset"
+})
+});
+
+
+if(!response.ok){
+
+throw new Error(
+"Google Sheets respondió con un error."
+);
+
+}
+
+
+const data=
+await response.json();
+
+
+if(!data.ok){
+
+throw new Error(
+data.message||
+"No se pudieron borrar los resultados."
+);
+
+}
+
+
+/*
+ Limpiamos también el respaldo local.
+*/
+
+localStorage.removeItem(
+STORAGE_KEY
+);
+
+
+state={
+results:{},
+knock:{}
+};
+
+
+renderAll();
+
+
+setStatus(
+"✓ Torneo borrado y sincronizado",
+"ok"
+);
+
+
+alert(
+"✅ Todos los resultados han sido borrados."
+);
+
+
+}catch(error){
+
+console.error(error);
+
+
+setStatus(
+"⚠️ No se pudo completar el borrado",
+"error"
+);
+
+
+alert(
+"❌ No se han podido borrar los resultados.\n\n"+
+error.message
+);
 
 }
 
@@ -2150,7 +2615,31 @@ location.reload();
    INICIO
    ========================================================== */
 
+/*
+ Primero mostramos inmediatamente el último estado local
+ si existe para que la página no aparezca vacía.
+*/
+
+const initialLocal=
+loadLocalBackup();
+
+
+if(initialLocal){
+
+state=
+initialLocal;
+
+}
+
+
 renderAll();
+
+
+/*
+ Después sincronizamos con Google Sheets.
+*/
+
+loadRemote();
 
 </script>
 
