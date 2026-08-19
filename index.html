@@ -4,64 +4,335 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#102b57">
-<title>Pádel Adultos Jemenuño 2026 · v1.2</title>
+<title>Pádel Adultos Jemenuño 2026 · v1.3</title>
+
 <style>
-:root{--navy:#102b57;--green:#64b526;--light:#f5f7fa;--line:#d9e0e8;--text:#17212b;--muted:#667382;--white:#fff;--gold:#d7a21a}
+:root{
+ --navy:#102b57;
+ --green:#64b526;
+ --light:#f5f7fa;
+ --line:#d9e0e8;
+ --text:#17212b;
+ --muted:#667382;
+ --white:#fff;
+ --gold:#d7a21a;
+}
+
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--light);color:var(--text)}
-header{background:linear-gradient(135deg,var(--navy),#1b467e);color:#fff;padding:20px 16px 16px;position:sticky;top:0;z-index:10;box-shadow:0 3px 12px #0002}
-h1{font-size:21px;margin:0 0 4px;font-weight:800}
-.sub{font-size:12px;opacity:.8}
-.tabs{display:flex;gap:7px;overflow:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:76px;z-index:9}
-.tab{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;white-space:nowrap;font-weight:700;color:var(--navy);font-size:13px}
-.tab.active{background:var(--green);border-color:var(--green);color:#fff}
-main{max-width:900px;margin:auto;padding:14px 12px 40px}
+
+body{
+ margin:0;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:var(--light);
+ color:var(--text)
+}
+
+header{
+ background:linear-gradient(135deg,var(--navy),#1b467e);
+ color:#fff;
+ padding:20px 16px 16px;
+ position:sticky;
+ top:0;
+ z-index:10;
+ box-shadow:0 3px 12px #0002
+}
+
+h1{
+ font-size:21px;
+ margin:0 0 4px;
+ font-weight:800
+}
+
+.sub{
+ font-size:12px;
+ opacity:.8
+}
+
+.tabs{
+ display:flex;
+ gap:7px;
+ overflow:auto;
+ padding:10px 12px;
+ background:#fff;
+ border-bottom:1px solid var(--line);
+ position:sticky;
+ top:76px;
+ z-index:9
+}
+
+.tab{
+ border:1px solid var(--line);
+ background:#fff;
+ border-radius:9px;
+ padding:9px 12px;
+ white-space:nowrap;
+ font-weight:700;
+ color:var(--navy);
+ font-size:13px
+}
+
+.tab.active{
+ background:var(--green);
+ border-color:var(--green);
+ color:#fff
+}
+
+main{
+ max-width:900px;
+ margin:auto;
+ padding:14px 12px 40px
+}
+
 .panel{display:none}
 .panel.active{display:block}
-h2{font-size:19px;color:var(--navy);margin:8px 0 12px}
-.note{background:#fff;border-left:4px solid var(--green);padding:11px 12px;border-radius:8px;margin-bottom:12px;font-size:13px;line-height:1.4}
-.subtabs{display:flex;gap:6px;margin:8px 0 12px}
-.subtab{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 4px;font-weight:800;color:var(--navy)}
-.subtab.active{background:var(--navy);color:#fff}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden;box-shadow:0 2px 7px #0000000a}
-.cardtitle{background:#eef3f7;padding:9px 11px;font-weight:800;color:var(--navy)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:8px 7px;border-bottom:1px solid #edf0f3;text-align:center}
-th{color:var(--muted);font-size:10px;text-transform:uppercase}
-td:first-child,th:first-child{text-align:left}
-.team{font-weight:700}
-.pos{font-weight:900;color:var(--navy);width:25px}
-.match{display:grid;grid-template-columns:54px minmax(0,1fr) 48px 20px 48px minmax(0,1fr);gap:5px;align-items:center;padding:11px;border-bottom:1px solid #edf0f3}
-.match:last-child{border-bottom:0}
-.time{font-size:10px;font-weight:800;color:var(--muted);text-align:center;grid-column:1}
-.p1{text-align:right;font-weight:700;font-size:13px}
-.p2{text-align:left;font-weight:700;font-size:13px}
-.score{width:48px;height:38px;border:1px solid var(--line);border-radius:7px;text-align:center;font-size:16px;font-weight:800;color:var(--navy);background:#fff}
-.dash{text-align:center;color:#9aa5b1}
-.win{color:var(--green)}
-button{border:0;border-radius:8px;padding:8px 11px;font-weight:800;cursor:pointer}
-.save{background:var(--green);color:#fff}
-.secondary{background:#eef3f7;color:var(--navy)}
-.winner{margin:9px 11px 11px;display:flex;gap:7px;align-items:center}
-.winner select{flex:1;padding:9px;border:1px solid var(--line);border-radius:7px;background:#fff}
-.bracket{display:grid;gap:10px}
-.slot{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px}
-.slot h3{margin:0 0 8px;font-size:13px;color:var(--navy)}
-.slotrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #eee}
-.slotrow:last-child{border-bottom:0}
-.champ{background:#fff8df;border-color:#edd27c}
-.empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
-.small{font-size:11px;color:var(--muted)}
-.danger{color:#b33}
-.header-actions{margin-top:10px;display:flex;justify-content:flex-end}
-.reset{float:none;background:#fff;color:var(--navy);font-size:11px}
+
+h2{
+ font-size:19px;
+ color:var(--navy);
+ margin:8px 0 12px
+}
+
+.note{
+ background:#fff;
+ border-left:4px solid var(--green);
+ padding:11px 12px;
+ border-radius:8px;
+ margin-bottom:12px;
+ font-size:13px;
+ line-height:1.4
+}
+
+.subtabs{
+ display:flex;
+ gap:6px;
+ margin:8px 0 12px
+}
+
+.subtab{
+ flex:1;
+ border:1px solid var(--line);
+ background:#fff;
+ border-radius:8px;
+ padding:9px 4px;
+ font-weight:800;
+ color:var(--navy)
+}
+
+.subtab.active{
+ background:var(--navy);
+ color:#fff
+}
+
+.card{
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:12px;
+ margin:10px 0;
+ overflow:hidden;
+ box-shadow:0 2px 7px #0000000a
+}
+
+.cardtitle{
+ background:#eef3f7;
+ padding:9px 11px;
+ font-weight:800;
+ color:var(--navy)
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ font-size:12px
+}
+
+th,td{
+ padding:8px 7px;
+ border-bottom:1px solid #edf0f3;
+ text-align:center
+}
+
+th{
+ color:var(--muted);
+ font-size:10px;
+ text-transform:uppercase
+}
+
+td:first-child,th:first-child{
+ text-align:left
+}
+
+.team{
+ font-weight:700
+}
+
+.pos{
+ font-weight:900;
+ color:var(--navy);
+ width:25px
+}
+
+.match{
+ display:grid;
+ grid-template-columns:54px minmax(0,1fr) 48px 20px 48px minmax(0,1fr);
+ gap:5px;
+ align-items:center;
+ padding:11px;
+ border-bottom:1px solid #edf0f3
+}
+
+.match:last-child{
+ border-bottom:0
+}
+
+.time{
+ font-size:10px;
+ font-weight:800;
+ color:var(--muted);
+ text-align:center;
+ grid-column:1
+}
+
+.p1{
+ text-align:right;
+ font-weight:700;
+ font-size:13px
+}
+
+.p2{
+ text-align:left;
+ font-weight:700;
+ font-size:13px
+}
+
+.score{
+ width:48px;
+ height:38px;
+ border:1px solid var(--line);
+ border-radius:7px;
+ text-align:center;
+ font-size:16px;
+ font-weight:800;
+ color:var(--navy);
+ background:#fff
+}
+
+.dash{
+ text-align:center;
+ color:#9aa5b1
+}
+
+.win{
+ color:var(--green)
+}
+
+button{
+ border:0;
+ border-radius:8px;
+ padding:8px 11px;
+ font-weight:800;
+ cursor:pointer
+}
+
+.save{
+ background:var(--green);
+ color:#fff
+}
+
+.secondary{
+ background:#eef3f7;
+ color:var(--navy)
+}
+
+.bracket{
+ display:grid;
+ gap:10px
+}
+
+.slot{
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:10px;
+ padding:12px
+}
+
+.slot h3{
+ margin:0 0 8px;
+ font-size:13px;
+ color:var(--navy)
+}
+
+.slotrow{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ padding:7px 0;
+ border-bottom:1px solid #eee
+}
+
+.slotrow:last-child{
+ border-bottom:0
+}
+
+.champ{
+ background:#fff8df;
+ border-color:#edd27c
+}
+
+.empty{
+ padding:18px;
+ text-align:center;
+ color:var(--muted);
+ font-size:13px
+}
+
+.small{
+ font-size:11px;
+ color:var(--muted)
+}
+
+.danger{
+ color:#b33
+}
+
+.header-actions{
+ margin-top:10px;
+ display:flex;
+ justify-content:flex-end
+}
+
+.reset{
+ float:none;
+ background:#fff;
+ color:var(--navy);
+ font-size:11px
+}
+
 @media(max-width:600px){
-.match{grid-template-columns:45px minmax(0,1fr) 42px 12px 42px minmax(0,1fr)}
-.p1,.p2{font-size:11px}
-.time{font-size:9px}
-.score{width:42px}
-.tabs{top:72px}
-header{padding-top:16px}
+
+ .match{
+  grid-template-columns:45px minmax(0,1fr) 42px 12px 42px minmax(0,1fr)
+ }
+
+ .p1,.p2{
+  font-size:11px
+ }
+
+ .time{
+  font-size:9px
+ }
+
+ .score{
+  width:42px
+ }
+
+ .tabs{
+  top:72px
+ }
+
+ header{
+  padding-top:16px
+ }
+
 }
 </style>
 </head>
@@ -69,78 +340,165 @@ header{padding-top:16px}
 <body>
 
 <header>
+
 <h1>🏆 Pádel Adultos Jemenuño 2026</h1>
-<div class="sub">Torneo · Fase Liga · Cuartos · Semifinal · Final · <b>v1.2</b></div>
+
+<div class="sub">
+Torneo · Fase Liga · Cuartos · Semifinal · Final · <b>v1.3</b>
+</div>
 
 <div class="header-actions">
-<button class="reset" onclick="resetAll()">Borrar todos los resultados</button>
+
+<button
+class="reset"
+onclick="resetAll()"
+>
+Borrar todos los resultados
+</button>
+
 </div>
+
 </header>
 
+
 <nav class="tabs">
-<button class="tab active" data-tab="grupos">Grupos Liga</button>
-<button class="tab" data-tab="cuartos">Cuartos de final</button>
-<button class="tab" data-tab="semis">Semifinal</button>
-<button class="tab" data-tab="final">Final</button>
+
+<button class="tab active" data-tab="grupos">
+Grupos Liga
+</button>
+
+<button class="tab" data-tab="cuartos">
+Cuartos de final
+</button>
+
+<button class="tab" data-tab="semis">
+Semifinal
+</button>
+
+<button class="tab" data-tab="final">
+Final
+</button>
+
 </nav>
 
+
 <main>
+
 
 <section id="grupos" class="panel active">
 
 <h2>Grupos Liga</h2>
 
 <div class="note">
-<b>Clasificación:</b>
-victorias → enfrentamiento directo en caso de empate en victorias →
-diferencia de juegos (a favor − en contra).
-Para el ranking posterior de primeros y segundos se usa % de victorias y,
-en caso de empate, diferencia media de juegos por partido y media de juegos a favor.
+
+<b>Criterio de clasificación:</b>
+
+<br><br>
+
+1. Número de victorias.
+
+<br>
+
+2. Si empatan dos parejas: enfrentamiento directo.
+
+<br>
+
+3. Si empatan tres parejas: se crea una clasificación entre las parejas empatadas utilizando únicamente sus enfrentamientos entre ellas y la diferencia de juegos a favor y en contra.
+
+<br>
+
+4. Si después de resolver el triple empate quedan solamente dos parejas empatadas, prevalece la pareja que ganó su enfrentamiento directo.
+
+<br>
+
+5. Si persiste cualquier empate, diferencia global de juegos a favor y en contra.
+
 </div>
 
+
 <div class="subtabs" id="groupTabs">
-<button class="subtab active" data-group="1">Grupo 1</button>
-<button class="subtab" data-group="2">Grupo 2</button>
-<button class="subtab" data-group="3">Grupo 3</button>
+
+<button
+class="subtab active"
+data-group="1"
+>
+Grupo 1
+</button>
+
+<button
+class="subtab"
+data-group="2"
+>
+Grupo 2
+</button>
+
+<button
+class="subtab"
+data-group="3"
+>
+Grupo 3
+</button>
+
 </div>
+
 
 <div id="groupContent"></div>
 
 </section>
+
 
 <section id="cuartos" class="panel">
 
 <h2>Cuartos de final</h2>
 
 <div class="note">
-<b>8 clasificados:</b>
-3 primeros, 3 segundos, 3.º del Grupo 3 y el mejor 3.º entre Grupos 1 y 2.
-El cuadro se genera automáticamente al completar la liga,
-evitando en lo posible repetir rival de grupo.
+
+<b>Clasificados:</b>
+
+2 primeros de los Grupos 1 y 2,
+3 primeros del Grupo 3,
+y el mejor 3.º entre los Grupos 1 y 2.
+
+<br><br>
+
+El ranking posterior ordenará a los clasificados según el criterio establecido.
+
 </div>
 
 <div id="ranking"></div>
+
 <div id="quarters"></div>
 
 </section>
 
+
 <section id="semis" class="panel">
 
 <h2>Semifinal</h2>
+
 <div id="semisContent"></div>
 
 </section>
 
+
 <section id="final" class="panel">
 
 <h2>Final</h2>
+
 <div id="finalContent"></div>
 
 </section>
 
+
 </main>
 
+
 <script>
+
+
+/* ==========================================================
+   PAREJAS
+   ========================================================== */
 
 const groups={
 
@@ -169,10 +527,10 @@ const groups={
 };
 
 
-/* ==========================================
+/* ==========================================================
    PARTIDOS PRE-CARGADOS
    ORDENADOS POR HORARIO
-   ========================================== */
+   ========================================================== */
 
 const matches={
 
@@ -237,17 +595,19 @@ const matches={
 
 let activeGroup=1;
 
+
 let state=JSON.parse(
 localStorage.getItem("jem_padel_adultos_2026")||"{}"
 );
+
 
 state.results=state.results||{};
 state.knock=state.knock||{};
 
 
-/* ==========================================
+/* ==========================================================
    GUARDADO
-   ========================================== */
+   ========================================================== */
 
 function save(){
 
@@ -261,20 +621,22 @@ renderAll();
 }
 
 
-/* ==========================================
+/* ==========================================================
    PESTAÑAS PRINCIPALES
-   ========================================== */
+   ========================================================== */
 
 document.querySelectorAll(".tab").forEach(b=>{
 
 b.onclick=()=>{
 
-document.querySelectorAll(".tab")
+document
+.querySelectorAll(".tab")
 .forEach(x=>x.classList.remove("active"));
 
 b.classList.add("active");
 
-document.querySelectorAll(".panel")
+document
+.querySelectorAll(".panel")
 .forEach(x=>x.classList.remove("active"));
 
 document
@@ -288,9 +650,9 @@ renderAll();
 });
 
 
-/* ==========================================
-   PESTAÑAS DE GRUPOS
-   ========================================== */
+/* ==========================================================
+   PESTAÑAS GRUPOS
+   ========================================================== */
 
 document.querySelectorAll(".subtab").forEach(b=>{
 
@@ -298,7 +660,8 @@ b.onclick=()=>{
 
 activeGroup=+b.dataset.group;
 
-document.querySelectorAll(".subtab")
+document
+.querySelectorAll(".subtab")
 .forEach(x=>x.classList.remove("active"));
 
 b.classList.add("active");
@@ -317,15 +680,16 @@ return `g${g}m${i}`;
 }
 
 
-/* ==========================================
-   RENDER GRUPOS
-   ========================================== */
+/* ==========================================================
+   OBTENER ESTADÍSTICAS
+   ========================================================== */
 
-function renderGroups(){
+function getStats(g){
 
-const arr=groups[activeGroup];
+let arr=groups[g];
 
 let stats={};
+
 
 arr.forEach(t=>{
 
@@ -339,18 +703,22 @@ gc:0
 });
 
 
-matches[activeGroup].forEach((m,i)=>{
+matches[g].forEach((m,i)=>{
 
-let r=state.results[key(activeGroup,i)];
+let r=state.results[key(g,i)];
+
 
 if(
-r &&
-r.a!=="" &&
-r.b!==""
-){
+!r ||
+r.a==="" ||
+r.b===""
+)
+return;
+
 
 let a=+r.a;
 let b=+r.b;
+
 
 stats[m[1]].gf+=a;
 stats[m[1]].gc+=b;
@@ -358,12 +726,14 @@ stats[m[1]].gc+=b;
 stats[m[2]].gf+=b;
 stats[m[2]].gc+=a;
 
+
 if(a>b){
 
 stats[m[1]].w++;
 stats[m[2]].l++;
 
 }
+
 else if(b>a){
 
 stats[m[2]].w++;
@@ -371,52 +741,44 @@ stats[m[1]].l++;
 
 }
 
+});
+
+
+return stats;
+
 }
 
-});
+
+/* ==========================================================
+   RESULTADO ENTRE DOS PAREJAS
+   ========================================================== */
+
+function getHeadToHead(g,a,b){
+
+let result=null;
 
 
-let sorted=arr.slice().sort((x,y)=>{
-
-let a=stats[x];
-let b=stats[y];
-
-if(b.w!==a.w)
-return b.w-a.w;
-
-return
-(b.gf-b.gc)-
-(a.gf-a.gc);
-
-});
-
-
-/* ==========================================
-   ENFRENTAMIENTO DIRECTO
-   ========================================== */
-
-function h2h(a,b){
-
-let aw=0;
-let bw=0;
-
-matches[activeGroup].forEach((m,i)=>{
+matches[g].forEach((m,i)=>{
 
 if(
 (m[1]===a && m[2]===b) ||
 (m[1]===b && m[2]===a)
 ){
 
-let r=state.results[key(activeGroup,i)];
+let r=state.results[key(g,i)];
+
 
 if(
-r &&
-r.a!=="" &&
-r.b!==""
-){
+!r ||
+r.a==="" ||
+r.b===""
+)
+return;
+
 
 let sa=+r.a;
 let sb=+r.b;
+
 
 if(m[1]===b){
 
@@ -424,11 +786,23 @@ if(m[1]===b){
 
 }
 
-if(sa>sb)
-aw++;
 
-if(sb>sa)
-bw++;
+if(sa>sb){
+
+result={
+winner:a,
+gamesA:sa,
+gamesB:sb
+};
+
+}
+else if(sb>sa){
+
+result={
+winner:b,
+gamesA:sa,
+gamesB:sb
+};
 
 }
 
@@ -436,34 +810,360 @@ bw++;
 
 });
 
-return aw-bw;
+
+return result;
 
 }
 
 
-sorted.sort((x,y)=>{
+/* ==========================================================
+   DIFERENCIA DE JUEGOS ENTRE UN GRUPO DE PAREJAS
+   SOLO SUS ENFRENTAMIENTOS ENTRE ELLAS
+   ========================================================== */
 
-let a=stats[x];
-let b=stats[y];
+function miniTable(g,teams){
 
-if(b.w!==a.w)
-return b.w-a.w;
+let mini={};
 
-let d=h2h(y,x);
 
-if(d!==0)
-return d;
+teams.forEach(t=>{
 
-return
-(b.gf-b.gc)-
-(a.gf-a.gc);
+mini[t]={
+w:0,
+gf:0,
+gc:0
+};
 
 });
 
 
-/* ==========================================
-   TABLA CLASIFICACIÓN
-   ========================================== */
+matches[g].forEach((m,i)=>{
+
+let aTeam=m[1];
+let bTeam=m[2];
+
+
+if(
+!teams.includes(aTeam) ||
+!teams.includes(bTeam)
+)
+return;
+
+
+let r=state.results[key(g,i)];
+
+
+if(
+!r ||
+r.a==="" ||
+r.b===""
+)
+return;
+
+
+let a=+r.a;
+let b=+r.b;
+
+
+mini[aTeam].gf+=a;
+mini[aTeam].gc+=b;
+
+mini[bTeam].gf+=b;
+mini[bTeam].gc+=a;
+
+
+if(a>b){
+
+mini[aTeam].w++;
+
+}
+
+else if(b>a){
+
+mini[bTeam].w++;
+
+}
+
+});
+
+
+return mini;
+
+}
+
+
+/* ==========================================================
+   ORDENACIÓN CORRECTA DEL GRUPO
+   ========================================================== */
+
+function getGroupStandings(g){
+
+let teams=groups[g];
+
+let stats=getStats(g);
+
+
+/*
+ Primero agrupamos por número de victorias.
+*/
+
+let victoryGroups={};
+
+
+teams.forEach(t=>{
+
+let w=stats[t].w;
+
+if(!victoryGroups[w])
+victoryGroups[w]=[];
+
+victoryGroups[w].push(t);
+
+});
+
+
+let ordered=[];
+
+
+/*
+ Procesamos cada grupo de parejas con las mismas victorias.
+*/
+
+Object
+.keys(victoryGroups)
+.map(Number)
+.sort((a,b)=>b-a)
+.forEach(w=>{
+
+let tied=victoryGroups[w];
+
+
+/*
+ ==========================================================
+ CASO 1: UNA PAREJA
+ ==========================================================
+ */
+
+if(tied.length===1){
+
+ordered.push(tied[0]);
+
+return;
+
+}
+
+
+/*
+ ==========================================================
+ CASO 2: DOS PAREJAS
+ ==========================================================
+ */
+
+if(tied.length===2){
+
+let h2h=getHeadToHead(
+g,
+tied[0],
+tied[1]
+);
+
+
+if(h2h){
+
+if(h2h.winner===tied[0]){
+
+ordered.push(tied[0],tied[1]);
+
+}
+else{
+
+ordered.push(tied[1],tied[0]);
+
+}
+
+return;
+
+}
+
+
+/*
+ Si todavía no hay partido entre ellas,
+ usamos diferencia global.
+ */
+
+tied.sort((a,b)=>{
+
+let da=
+stats[b].gf-
+stats[b].gc;
+
+let db=
+stats[a].gf-
+stats[a].gc;
+
+return da-db;
+
+});
+
+
+ordered.push(...tied);
+
+return;
+
+}
+
+
+/*
+ ==========================================================
+ CASO 3 O MÁS PAREJAS
+ ==========================================================
+ */
+
+let mini=miniTable(g,tied);
+
+
+/*
+ En vuestro formato todos juegan un único set,
+ por lo que el criterio de sets no puede romper
+ el triple empate.
+
+ Utilizamos:
+
+ 1. Victorias dentro del grupo empatado
+ 2. Diferencia de juegos dentro del grupo empatado
+*/
+
+tied.sort((a,b)=>{
+
+let wa=mini[a].w;
+let wb=mini[b].w;
+
+if(wb!==wa)
+return wb-wa;
+
+
+let da=
+mini[a].gf-
+mini[a].gc;
+
+let db=
+mini[b].gf-
+mini[b].gc;
+
+if(db!==da)
+return db-da;
+
+
+/*
+ Si dos quedan exactamente empatadas después
+ de la mini-clasificación, enfrentamiento directo.
+*/
+
+let h2h=getHeadToHead(g,a,b);
+
+if(h2h){
+
+if(h2h.winner===a)
+return -1;
+
+if(h2h.winner===b)
+return 1;
+
+}
+
+
+/*
+ Último criterio: diferencia global.
+*/
+
+let globalA=
+stats[a].gf-
+stats[a].gc;
+
+let globalB=
+stats[b].gf-
+stats[b].gc;
+
+return globalB-globalA;
+
+});
+
+
+/*
+ Si tras la mini-clasificación quedan
+ dos parejas exactamente iguales, aplicamos
+ enfrentamiento directo de forma explícita.
+*/
+
+for(let i=0;i<tied.length-1;i++){
+
+let a=tied[i];
+let b=tied[i+1];
+
+let ma=
+mini[a].w;
+
+let mb=
+mini[b].w;
+
+let da=
+mini[a].gf-
+mini[a].gc;
+
+let db=
+mini[b].gf-
+mini[b].gc;
+
+
+if(
+ma===mb &&
+da===db
+){
+
+let h2h=getHeadToHead(g,a,b);
+
+if(h2h){
+
+if(h2h.winner===b){
+
+let ia=tied.indexOf(a);
+let ib=tied.indexOf(b);
+
+[tied[ia],tied[ib]]
+=
+[tied[ib],tied[ia]];
+
+}
+
+}
+
+}
+
+}
+
+
+ordered.push(...tied);
+
+});
+
+
+return ordered;
+
+}
+
+
+/* ==========================================================
+   RENDER GRUPO
+   ========================================================== */
+
+function renderGroups(){
+
+let sorted=
+getGroupStandings(activeGroup);
+
+let stats=
+getStats(activeGroup);
+
 
 let table=`
 
@@ -478,6 +1178,7 @@ Clasificación — Grupo ${activeGroup}
 <thead>
 
 <tr>
+
 <th>#</th>
 <th>Pareja</th>
 <th>PJ</th>
@@ -486,6 +1187,7 @@ Clasificación — Grupo ${activeGroup}
 <th>JF</th>
 <th>JC</th>
 <th>Dif.</th>
+
 </tr>
 
 </thead>
@@ -545,20 +1247,24 @@ table+=`
 
 </tbody>
 </table>
+
 </div>
 `;
 
 
-/* ==========================================
+/* ==========================================================
    PARTIDOS
-   ========================================== */
+   ========================================================== */
 
 let ms=`
 
 <div class="card">
 
 <div class="cardtitle">
-Partidos del Grupo ${activeGroup} · horarios orientativos
+
+Partidos del Grupo ${activeGroup}
+· horarios orientativos
+
 </div>
 `;
 
@@ -686,18 +1392,20 @@ Guardar
 `;
 
 
-document.getElementById("groupContent")
+document
+.getElementById("groupContent")
 .innerHTML=
 table+ms;
+
 
 attachResultListeners();
 
 }
 
 
-/* ==========================================
-   RESULTADOS
-   ========================================== */
+/* ==========================================================
+   GUARDAR RESULTADOS
+   ========================================================== */
 
 function attachResultListeners(){
 
@@ -724,10 +1432,12 @@ state.results[k][el.dataset.side]
 =
 el.value.trim();
 
+
 localStorage.setItem(
 "jem_padel_adultos_2026",
 JSON.stringify(state)
 );
+
 
 renderAll();
 
@@ -764,6 +1474,7 @@ el.value.trim();
 
 });
 
+
 localStorage.setItem(
 "jem_padel_adultos_2026",
 JSON.stringify(state)
@@ -774,76 +1485,14 @@ renderAll();
 }
 
 
-/* ==========================================
-   ESTADÍSTICAS
-   ========================================== */
-
-function getStats(g){
-
-let arr=groups[g];
-
-let s={};
-
-arr.forEach(t=>{
-
-s[t]={
-w:0,
-l:0,
-gf:0,
-gc:0
-};
-
-});
-
-
-matches[g].forEach((m,i)=>{
-
-let r=
-state.results[key(g,i)];
-
-if(
-!r ||
-r.a==="" ||
-r.b===""
-)
-return;
-
-let a=+r.a;
-let b=+r.b;
-
-s[m[1]].gf+=a;
-s[m[1]].gc+=b;
-
-s[m[2]].gf+=b;
-s[m[2]].gc+=a;
-
-if(a>b){
-
-s[m[1]].w++;
-s[m[2]].l++;
-
-}
-else if(b>a){
-
-s[m[2]].w++;
-s[m[1]].l++;
-
-}
-
-});
-
-return s;
-
-}
-
-
-/* ==========================================
-   RANKING
-   ========================================== */
+/* ==========================================================
+   RANKING GENERAL
+   ========================================================== */
 
 function rankingData(){
 
 let data=[];
+
 
 for(
 let g=1;
@@ -851,117 +1500,193 @@ g<=3;
 g++
 ){
 
-let s=getStats(g);
+let stats=
+getStats(g);
 
-let arr=
-groups[g]
-.slice()
-.sort((a,b)=>{
-
-if(s[b].w!==s[a].w)
-return s[b].w-s[a].w;
-
-return
-(s[b].gf-s[b].gc)-
-(s[a].gf-s[a].gc);
-
-});
+let standings=
+getGroupStandings(g);
 
 
-arr.forEach((t,i)=>{
+standings.forEach((t,i)=>{
+
+let s=stats[t];
+
+let pj=s.w+s.l;
 
 data.push({
 
 team:t,
-g,
+g:g,
 pos:i+1,
-w:s[t].w,
-pj:s[t].w+s[t].l,
-diff:s[t].gf-s[t].gc,
-gf:s[t].gf,
-gc:s[t].gc,
-wp:
-s[t].w/
-(s[t].w+s[t].l||1)
+w:s.w,
+pj:pj,
+diff:s.gf-s.gc,
+gf:s.gf,
+gc:s.gc,
+wp:pj?s.w/pj:0
 
 });
 
 });
 
 }
+
 
 return data;
 
 }
 
 
-/* ==========================================
+/* ==========================================================
    CUARTOS
-   ========================================== */
+   ========================================================== */
 
 function renderKnock(){
 
-let d=rankingData();
+let d=
+rankingData();
 
-let q=
+
+/*
+ Mejores terceros entre Grupo 1 y Grupo 2.
+ */
+
+let third12=
 d.filter(x=>
 (x.g===1||x.g===2)&&
 x.pos===3
 );
 
+
 let best3=
-q.sort(
-(a,b)=>b.diff-a.diff
-)[0];
+third12.sort((a,b)=>{
+
+if(b.diff!==a.diff)
+return b.diff-a.diff;
+
+return b.gf-a.gf;
+
+})[0];
 
 
-let qualified=
-d.filter(x=>x.pos<=2)
-.concat(
-d.find(
-x=>x.g===3&&x.pos===3
-)||[]
-);
+/*
+ Clasificados:
+
+ G1 1º y 2º
+ G2 1º y 2º
+ G3 1º, 2º y 3º
+ Mejor 3º G1/G2
+ */
+
+let qualified=[];
+
+
+d.forEach(x=>{
+
+if(
+(x.g===1||x.g===2) &&
+x.pos<=2
+){
+
+qualified.push(x);
+
+}
+
+});
+
+
+d.forEach(x=>{
+
+if(
+x.g===3 &&
+x.pos<=3
+){
+
+qualified.push(x);
+
+}
+
+});
 
 
 if(best3)
 qualified.push(best3);
 
 
+/*
+ Mejores primeros
+ */
+
 let firsts=
 qualified
 .filter(x=>x.pos===1)
-.sort(
-(a,b)=>
-b.wp-a.wp||
-b.diff/(b.pj||1)-
-a.diff/(a.pj||1)||
-b.gf/(b.pj||1)-
-a.gf/(a.pj||1)
-);
+.sort((a,b)=>{
 
+if(b.wp!==a.wp)
+return b.wp-a.wp;
+
+let da=
+b.diff/(b.pj||1);
+
+let db=
+a.diff/(a.pj||1);
+
+if(da!==db)
+return da-db;
+
+return
+b.gf/(b.pj||1)-
+a.gf/(a.pj||1);
+
+});
+
+
+/*
+ Mejores segundos
+ */
 
 let seconds=
 qualified
 .filter(x=>x.pos===2)
-.sort(
-(a,b)=>
-b.wp-a.wp||
-b.diff/(b.pj||1)-
-a.diff/(a.pj||1)||
-b.gf/(b.pj||1)-
-a.gf/(a.pj||1)
-);
+.sort((a,b)=>{
 
+if(b.wp!==a.wp)
+return b.wp-a.wp;
+
+let da=
+b.diff/(b.pj||1);
+
+let db=
+a.diff/(a.pj||1);
+
+if(da!==db)
+return da-db;
+
+return
+b.gf/(b.pj||1)-
+a.gf/(a.pj||1);
+
+});
+
+
+/*
+ Terceros
+ */
 
 let thirds=
 qualified
 .filter(x=>x.pos===3)
-.sort(
-(a,b)=>
-b.wp-a.wp||
-b.diff-a.diff
-);
+.sort((a,b)=>{
+
+if(b.wp!==a.wp)
+return b.wp-a.wp;
+
+if(b.diff!==a.diff)
+return b.diff-a.diff;
+
+return b.gf-a.gf;
+
+});
 
 
 let ranked=[
@@ -984,12 +1709,14 @@ Ranking de 8 clasificados
 <thead>
 
 <tr>
+
 <th>#</th>
 <th>Pareja</th>
 <th>Grupo</th>
 <th>Puesto</th>
 <th>% V</th>
 <th>Dif./PJ</th>
+
 </tr>
 
 </thead>
@@ -1039,13 +1766,19 @@ html+=`
 
 </tbody>
 </table>
+
 </div>
 `;
 
 
-document.getElementById("ranking")
+document
+.getElementById("ranking")
 .innerHTML=html;
 
+
+/* ==========================================================
+   CRUCES
+   ========================================================== */
 
 let pairs=[
 
@@ -1143,15 +1876,16 @@ Guardar ganadores
 `;
 
 
-document.getElementById("quarters")
+document
+.getElementById("quarters")
 .innerHTML=bhtml;
 
 }
 
 
-/* ==========================================
+/* ==========================================================
    GUARDAR ELIMINATORIAS
-   ========================================== */
+   ========================================================== */
 
 function saveKnock(){
 
@@ -1165,16 +1899,15 @@ x.value;
 
 });
 
-save();
 
-alert("Ganadores guardados.");
+save();
 
 }
 
 
-/* ==========================================
+/* ==========================================================
    SEMIFINALES
-   ========================================== */
+   ========================================================== */
 
 function renderSemis(){
 
@@ -1280,22 +2013,28 @@ Guardar ganadores
 `;
 
 
-document.getElementById("semisContent")
+document
+.getElementById("semisContent")
 .innerHTML=h;
 
 }
 
 
-/* ==========================================
+/* ==========================================================
    FINAL
-   ========================================== */
+   ========================================================== */
 
 function renderFinal(){
 
-let a=state.knock.s0;
-let b=state.knock.s1;
+let a=
+state.knock.s0;
 
-document.getElementById("finalContent")
+let b=
+state.knock.s1;
+
+
+document
+.getElementById("finalContent")
 .innerHTML=`
 
 <div class="slot champ">
@@ -1367,9 +2106,9 @@ Guardar campeón
 }
 
 
-/* ==========================================
-   ACTUALIZAR TODO
-   ========================================== */
+/* ==========================================================
+   ACTUALIZAR
+   ========================================================== */
 
 function renderAll(){
 
@@ -1384,9 +2123,9 @@ renderFinal();
 }
 
 
-/* ==========================================
+/* ==========================================================
    BORRAR TODO
-   ========================================== */
+   ========================================================== */
 
 function resetAll(){
 
@@ -1406,6 +2145,10 @@ location.reload();
 
 }
 
+
+/* ==========================================================
+   INICIO
+   ========================================================== */
 
 renderAll();
 
