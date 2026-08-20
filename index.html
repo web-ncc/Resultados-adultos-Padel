@@ -433,25 +433,25 @@ Final
 
 <br><br>
 
-<b>Empate de 2 parejas:</b>
+<b>Empate entre 2 parejas:</b>
 
 <br>
-1. Victorias.
+1. Número de victorias.
 <br>
 2. Enfrentamiento directo.
 
 <br><br>
 
-<b>Empate de 3 parejas:</b>
+<b>Empate entre 3 parejas:</b>
 
 <br>
-1. Victorias obtenidas entre las parejas empatadas en todos sus enfrentamientos entre ellas.
+1. Victorias obtenidas entre las parejas empatadas.
 <br>
 2. Diferencia global de juegos.
 <br>
 3. Si persiste el empate, diferencia de juegos únicamente entre las parejas empatadas.
 <br>
-4. Si después de estos criterios quedan solamente 2 parejas empatadas, enfrentamiento directo entre esas dos.
+4. Si después quedan solamente 2 parejas empatadas, enfrentamiento directo entre esas dos.
 
 </div>
 
@@ -498,6 +498,17 @@ Grupo 3
 2 primeros de los Grupos 1 y 2,
 3 primeros del Grupo 3,
 y el mejor 3.º entre los Grupos 1 y 2.
+
+<br><br>
+
+El mejor 3.º se determina por:
+
+<br>
+1. Número de victorias.
+<br>
+2. Diferencia global de juegos.
+<br>
+3. Juegos a favor.
 
 <br><br>
 
@@ -1110,7 +1121,7 @@ return result;
 
 
 /* ==========================================================
-   MINI-CLASIFICACIÓN ENTRE LAS PAREJAS EMPATADAS
+   MINI CLASIFICACIÓN ENTRE PAREJAS EMPATADAS
    ========================================================== */
 
 function miniTable(g,teams){
@@ -1182,19 +1193,15 @@ return mini;
 
 function getGroupStandings(g){
 
-const teams=groups[g];
-const stats=getStats(g);
+let teams=groups[g];
+
+let stats=getStats(g);
 
 let victoryGroups={};
 
-
-/*
- PRIMERO AGRUPAMOS POR VICTORIAS GLOBALES
-*/
-
 teams.forEach(t=>{
 
-const w=stats[t].w;
+let w=stats[t].w;
 
 if(!victoryGroups[w])
 victoryGroups[w]=[];
@@ -1203,13 +1210,12 @@ victoryGroups[w].push(t);
 
 });
 
-
 let ordered=[];
 
 
 /*
- PROCESAMOS CADA BLOQUE DE PAREJAS
- QUE TENGAN LAS MISMAS VICTORIAS
+ Procesamos cada grupo de victorias
+ de mayor a menor.
 */
 
 Object
@@ -1218,11 +1224,12 @@ Object
 .sort((a,b)=>b-a)
 .forEach(w=>{
 
-let tied=victoryGroups[w];
+let tied=
+victoryGroups[w];
 
 
 /* ==========================================================
-   UNA SOLA PAREJA
+   UNA PAREJA
    ========================================================== */
 
 if(tied.length===1){
@@ -1235,25 +1242,20 @@ return;
 
 
 /* ==========================================================
-   EMPATE DE 2 PAREJAS
+   DOS PAREJAS
+   CRITERIO:
+   1. VICTORIAS
+   2. ENFRENTAMIENTO DIRECTO
    ========================================================== */
 
 if(tied.length===2){
 
-const h2h=
+let h2h=
 getHeadToHead(
 g,
 tied[0],
 tied[1]
 );
-
-
-/*
- En empate de 2:
-
- 1. Victorias
- 2. Enfrentamiento directo
-*/
 
 if(h2h){
 
@@ -1279,22 +1281,25 @@ return;
 
 
 /*
- Si todavía no se han enfrentado,
- usamos diferencia global como
- respaldo técnico.
+ Si todavía no existe el enfrentamiento,
+ mantenemos diferencia global como
+ desempate provisional.
 */
 
 tied.sort((a,b)=>{
 
-const da=
-stats[b].gf-
-stats[b].gc;
-
-const db=
+let da=
 stats[a].gf-
 stats[a].gc;
 
-return da-db;
+let db=
+stats[b].gf-
+stats[b].gc;
+
+if(db!==da)
+return db-da;
+
+return stats[b].gf-stats[a].gf;
 
 });
 
@@ -1306,149 +1311,403 @@ return;
 
 
 /* ==========================================================
-   EMPATE DE 3 O MÁS PAREJAS
+   TRES O MÁS PAREJAS EMPATADAS
    ========================================================== */
 
-const mini=
+let mini=
 miniTable(g,tied);
 
 
 /*
- Para cada pareja calculamos:
-
- 1. Victorias entre las parejas empatadas
- 2. Diferencia GLOBAL de juegos
- 3. Diferencia de juegos SOLO entre
-    las parejas empatadas
+ 1. VICTORIAS OBTENIDAS ENTRE LAS PAREJAS EMPATADAS
 */
 
-const data=tied.map(team=>{
+tied.sort((a,b)=>{
 
-const globalDiff=
-stats[team].gf-
-stats[team].gc;
+let wa=
+mini[a].w;
 
-const miniDiff=
-mini[team].gf-
-mini[team].gc;
+let wb=
+mini[b].w;
 
-return{
-
-team:team,
-
-miniWins:mini[team].w,
-
-globalDiff:globalDiff,
-
-miniDiff:miniDiff
-
-};
+return wb-wa;
 
 });
 
 
 /*
- ORDENAMOS EXACTAMENTE EN ESTE ORDEN:
-
- 1. Victorias entre las parejas empatadas
- 2. Diferencia GLOBAL
- 3. Diferencia SOLO entre las parejas empatadas
+ Separamos por número de victorias
+ dentro de la mini-clasificación.
 */
 
-data.sort((a,b)=>{
+let miniVictoryGroups={};
 
-if(a.miniWins!==b.miniWins){
+tied.forEach(t=>{
 
-return b.miniWins-a.miniWins;
+let w=
+mini[t].w;
 
-}
+if(!miniVictoryGroups[w])
+miniVictoryGroups[w]=[];
 
-if(a.globalDiff!==b.globalDiff){
-
-return b.globalDiff-a.globalDiff;
-
-}
-
-if(a.miniDiff!==b.miniDiff){
-
-return b.miniDiff-a.miniDiff;
-
-}
-
-return 0;
+miniVictoryGroups[w].push(t);
 
 });
 
 
+let resolved=[];
+
+
 /*
- Ahora buscamos bloques que hayan quedado
- EXACTAMENTE empatados después de los
- tres criterios anteriores.
+ Procesamos los grupos resultantes
+ de victorias internas.
 */
 
-let i=0;
+Object
+.keys(miniVictoryGroups)
+.map(Number)
+.sort((a,b)=>b-a)
+.forEach(mw=>{
 
-while(i<data.length){
+let sub=
+miniVictoryGroups[mw];
 
-let j=i+1;
 
-while(
-j<data.length &&
-data[j].miniWins===data[i].miniWins &&
-data[j].globalDiff===data[i].globalDiff &&
-data[j].miniDiff===data[i].miniDiff
-){
+/* ==========================================================
+   UNA PAREJA
+   ========================================================== */
 
-j++;
+if(sub.length===1){
+
+resolved.push(sub[0]);
+
+return;
 
 }
 
 
-const block=
-data.slice(i,j);
+/* ==========================================================
+   DOS PAREJAS
+   TRAS EL TRIPLE EMPATE
+   ENFRENTAMIENTO DIRECTO
+   ========================================================== */
+
+if(sub.length===2){
+
+/*
+ Antes del enfrentamiento directo,
+ el criterio general establece
+ diferencia global.
+*/
+
+let da=
+stats[sub[0]].gf-
+stats[sub[0]].gc;
+
+let db=
+stats[sub[1]].gf-
+stats[sub[1]].gc;
 
 
 /*
- Si quedan SOLO DOS parejas empatadas,
- aplicamos enfrentamiento directo.
+ Si la diferencia global es distinta,
+ se utiliza primero.
 */
 
-if(block.length===2){
+if(da!==db){
 
-const a=block[0].team;
-const b=block[1].team;
+if(da>db){
 
-const h2h=
-getHeadToHead(g,a,b);
+resolved.push(
+sub[0],
+sub[1]
+);
+
+}else{
+
+resolved.push(
+sub[1],
+sub[0]
+);
+
+}
+
+return;
+
+}
+
+
+/*
+ Si la diferencia global también empata,
+ enfrentamiento directo.
+*/
+
+let h2h=
+getHeadToHead(
+g,
+sub[0],
+sub[1]
+);
 
 if(h2h){
 
-if(h2h.winner===b){
+if(h2h.winner===sub[0]){
 
-block.reverse();
+resolved.push(
+sub[0],
+sub[1]
+);
+
+}else{
+
+resolved.push(
+sub[1],
+sub[0]
+);
 
 }
 
-}
+return;
 
 }
 
 
 /*
- Si queda una sola pareja, simplemente pasa.
-
- Si siguen empatadas 3 o más después de
- todos los criterios, no inventamos otro
- criterio: conservamos el orden obtenido.
+ Último recurso: diferencia
+ únicamente entre las parejas implicadas.
 */
 
-block.forEach(x=>
-ordered.push(x.team)
+let ma=
+mini[sub[0]].gf-
+mini[sub[0]].gc;
+
+let mb=
+mini[sub[1]].gf-
+mini[sub[1]].gc;
+
+if(ma!==mb){
+
+if(ma>mb){
+
+resolved.push(
+sub[0],
+sub[1]
 );
 
-i=j;
+}else{
+
+resolved.push(
+sub[1],
+sub[0]
+);
 
 }
+
+return;
+
+}
+
+resolved.push(...sub);
+
+return;
+
+}
+
+
+/* ==========================================================
+   TRES O MÁS PAREJAS SIGUEN EMPATADAS
+   DIFERENCIA GLOBAL
+   ========================================================== */
+
+sub.sort((a,b)=>{
+
+let da=
+stats[a].gf-
+stats[a].gc;
+
+let db=
+stats[b].gf-
+stats[b].gc;
+
+return db-da;
+
+});
+
+
+/*
+ Agrupamos nuevamente por diferencia global.
+*/
+
+let globalDiffGroups={};
+
+sub.forEach(t=>{
+
+let d=
+stats[t].gf-
+stats[t].gc;
+
+if(!globalDiffGroups[d])
+globalDiffGroups[d]=[];
+
+globalDiffGroups[d].push(t);
+
+});
+
+
+/*
+ Para cada grupo que sigue empatado,
+ aplicamos diferencia SOLO entre
+ las parejas implicadas.
+*/
+
+Object
+.keys(globalDiffGroups)
+.map(Number)
+.sort((a,b)=>b-a)
+.forEach(gd=>{
+
+let sub2=
+globalDiffGroups[gd];
+
+
+/*
+ Si solo queda una, resuelta.
+*/
+
+if(sub2.length===1){
+
+resolved.push(sub2[0]);
+
+return;
+
+}
+
+
+/*
+ Diferencia de juegos únicamente
+ entre las parejas empatadas.
+*/
+
+sub2.sort((a,b)=>{
+
+let da=
+mini[a].gf-
+mini[a].gc;
+
+let db=
+mini[b].gf-
+mini[b].gc;
+
+return db-da;
+
+});
+
+
+/*
+ Si después de esto quedan exactamente
+ dos empatadas, enfrentamiento directo.
+*/
+
+let finalGroups={};
+
+sub2.forEach(t=>{
+
+let d=
+mini[t].gf-
+mini[t].gc;
+
+if(!finalGroups[d])
+finalGroups[d]=[];
+
+finalGroups[d].push(t);
+
+});
+
+
+Object
+.keys(finalGroups)
+.map(Number)
+.sort((a,b)=>b-a)
+.forEach(md=>{
+
+let sub3=
+finalGroups[md];
+
+
+/*
+ UNA PAREJA
+*/
+
+if(sub3.length===1){
+
+resolved.push(sub3[0]);
+
+return;
+
+}
+
+
+/*
+ DOS PAREJAS:
+ ENFRENTAMIENTO DIRECTO
+*/
+
+if(sub3.length===2){
+
+let h2h=
+getHeadToHead(
+g,
+sub3[0],
+sub3[1]
+);
+
+if(h2h){
+
+if(h2h.winner===sub3[0]){
+
+resolved.push(
+sub3[0],
+sub3[1]
+);
+
+}else{
+
+resolved.push(
+sub3[1],
+sub3[0]
+);
+
+}
+
+return;
+
+}
+
+
+/*
+ Si excepcionalmente siguen 3 o más
+ empatadas después de todos los criterios,
+ usamos juegos a favor globales como
+ último desempate.
+*/
+
+sub3.sort((a,b)=>{
+
+return stats[b].gf-
+stats[a].gf;
+
+});
+
+resolved.push(...sub3);
+
+});
+
+});
+
+});
+
+
+ordered.push(...resolved);
 
 });
 
@@ -1500,7 +1759,6 @@ Clasificación — Grupo ${activeGroup}
 <tbody>
 `;
 
-
 sorted.forEach((t,i)=>{
 
 let s=
@@ -1548,7 +1806,6 @@ ${s.gf-s.gc>0?"+":""}${s.gf-s.gc}
 
 });
 
-
 table+=`
 
 </tbody>
@@ -1574,7 +1831,6 @@ Partidos del Grupo ${activeGroup}
 </div>
 `;
 
-
 matches[activeGroup].forEach((m,i)=>{
 
 let r=
@@ -1585,7 +1841,6 @@ a:"",
 b:"",
 tb:""
 };
-
 
 ms+=`
 
@@ -1633,7 +1888,6 @@ ${m[2]}
 
 </div>
 `;
-
 
 if(
 r.a==="4" &&
@@ -1699,7 +1953,6 @@ Guardar
 </div>
 `;
 
-
 document
 .getElementById("groupContent")
 .innerHTML=
@@ -1746,6 +1999,11 @@ tb:""
 state.results[k][el.dataset.side]
 =
 el.value.trim();
+
+/*
+ Guardamos automáticamente
+ en Google Sheets.
+*/
 
 save();
 
@@ -1855,7 +2113,12 @@ rankingData();
 
 
 /*
- Mejores terceros entre Grupo 1 y Grupo 2.
+ Mejor tercero entre Grupo 1 y Grupo 2.
+
+ CRITERIO:
+ 1. Victorias
+ 2. Diferencia global
+ 3. Juegos a favor
 */
 
 let third12=
@@ -1867,10 +2130,30 @@ x.pos===3
 let best3=
 third12.sort((a,b)=>{
 
+/*
+ 1. VICTORIAS
+*/
+
+if(b.w!==a.w)
+return b.w-a.w;
+
+
+/*
+ 2. DIFERENCIA GLOBAL
+*/
+
 if(b.diff!==a.diff)
 return b.diff-a.diff;
 
+
+/*
+ 3. JUEGOS A FAVOR
+*/
+
+if(b.gf!==a.gf)
 return b.gf-a.gf;
+
+return 0;
 
 })[0];
 
@@ -2031,7 +2314,6 @@ Ranking de 8 clasificados
 <tbody>
 `;
 
-
 ranked.forEach((x,i)=>{
 
 html+=`
@@ -2068,7 +2350,6 @@ ${(x.diff/(x.pj||1)).toFixed(2)}
 
 });
 
-
 html+=`
 
 </tbody>
@@ -2076,7 +2357,6 @@ html+=`
 
 </div>
 `;
-
 
 document
 .getElementById("ranking")
@@ -2100,10 +2380,8 @@ let pairs=[
 
 ];
 
-
 let bhtml=
 `<div class="bracket">`;
-
 
 pairs.forEach((p,i)=>{
 
@@ -2167,7 +2445,6 @@ ${x.team}
 
 });
 
-
 bhtml+=`
 
 </div>
@@ -2183,7 +2460,6 @@ Guardar ganadores
 
 </div>
 `;
-
 
 document
 .getElementById("quarters")
@@ -2229,7 +2505,6 @@ state.knock.q3
 
 ];
 
-
 let pairs=[
 
 [qs[0],qs[1]],
@@ -2238,10 +2513,8 @@ let pairs=[
 
 ];
 
-
 let h=
 '<div class="bracket">';
-
 
 pairs.forEach((p,i)=>{
 
@@ -2305,7 +2578,6 @@ ${x}
 
 });
 
-
 h+=`
 
 </div>
@@ -2321,7 +2593,6 @@ Guardar ganadores
 
 </div>
 `;
-
 
 document
 .getElementById("semisContent")
@@ -2484,11 +2755,6 @@ data.message||
 );
 
 }
-
-
-/*
- Limpiamos también el respaldo local.
-*/
 
 localStorage.removeItem(
 STORAGE_KEY
